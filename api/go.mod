@@ -1,4 +1,4 @@
-module github.com/RafaySystems/ip-address-manager/api
+module github.com/metal3-io/ip-address-manager/api
 
 go 1.23.0
 
