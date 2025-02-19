@@ -14,6 +14,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,14 +34,15 @@ func (c *IPClaim) SetupWebhookWithManager(mgr ctrl.Manager) error {
 // +kubebuilder:webhook:verbs=create;update,path=/validate-ipam-metal3-io-v1alpha1-ipclaim,mutating=false,failurePolicy=fail,groups=ipam.metal3.io,resources=ipclaims,versions=v1alpha1,name=validation.ipclaim.ipam.metal3.io,matchPolicy=Equivalent,sideEffects=None,admissionReviewVersions=v1;v1beta1
 // +kubebuilder:webhook:verbs=create;update,path=/mutate-ipam-metal3-io-v1alpha1-ipclaim,mutating=true,failurePolicy=fail,groups=ipam.metal3.io,resources=ipclaims,versions=v1alpha1,name=default.ipclaim.ipam.metal3.io,matchPolicy=Equivalent,sideEffects=None,admissionReviewVersions=v1;v1beta1
 
-var _ webhook.Defaulter = &IPClaim{}
-var _ webhook.Validator = &IPClaim{}
+var _ webhook.CustomDefaulter = &IPClaim{}
+var _ webhook.CustomValidator = &IPClaim{}
 
-func (c *IPClaim) Default() {
+func (c *IPClaim) Default(ctx context.Context, obj runtime.Object) error {
+	return nil
 }
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPClaim) ValidateCreate() (admission.Warnings, error) {
+func (c *IPClaim) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	allErrs := field.ErrorList{}
 	if c.Spec.Pool.Name == "" {
 		allErrs = append(allErrs,
@@ -58,7 +61,7 @@ func (c *IPClaim) ValidateCreate() (admission.Warnings, error) {
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPClaim) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+func (c *IPClaim) ValidateUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) (admission.Warnings, error) {
 	allErrs := field.ErrorList{}
 	oldIPClaim, ok := old.(*IPClaim)
 	if !ok || oldIPClaim == nil {
@@ -98,6 +101,6 @@ func (c *IPClaim) ValidateUpdate(old runtime.Object) (admission.Warnings, error)
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPClaim) ValidateDelete() (admission.Warnings, error) {
+func (c *IPClaim) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	return nil, nil
 }

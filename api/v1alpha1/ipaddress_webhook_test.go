@@ -30,7 +30,7 @@ func TestIPAddressDefault(t *testing.T) {
 		},
 		Spec: IPAddressSpec{},
 	}
-	c.Default()
+	c.Default(nil, nil)
 
 	g.Expect(c.Spec).To(Equal(IPAddressSpec{}))
 }
@@ -110,13 +110,13 @@ func TestIPAddressCreateValidation(t *testing.T) {
 			}
 
 			if tt.expectErr {
-				_, err := obj.ValidateCreate()
+				_, err := obj.ValidateCreate(nil, nil)
 				g.Expect(err).To(HaveOccurred())
 			} else {
-				_, err := obj.ValidateCreate()
+				_, err := obj.ValidateCreate(nil, nil)
 				g.Expect(err).NotTo(HaveOccurred())
 			}
-			_, err := obj.ValidateDelete()
+			_, err := obj.ValidateDelete(nil, nil)
 			g.Expect(err).NotTo(HaveOccurred())
 		})
 	}
@@ -309,10 +309,10 @@ func TestIPAddressUpdateValidation(t *testing.T) {
 			}
 
 			if tt.expectErr {
-				_, err := newAdd.ValidateUpdate(old)
+				_, err := newAdd.ValidateUpdate(nil, nil, old)
 				g.Expect(err).To(HaveOccurred())
 			} else {
-				_, err := newAdd.ValidateUpdate(old)
+				_, err := newAdd.ValidateUpdate(nil, nil, old)
 				g.Expect(err).NotTo(HaveOccurred())
 			}
 		})

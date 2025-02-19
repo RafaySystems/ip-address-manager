@@ -14,6 +14,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
 	"net"
 	"net/netip"
 	"reflect"
@@ -36,19 +37,20 @@ func (c *IPPool) SetupWebhookWithManager(mgr ctrl.Manager) error {
 // +kubebuilder:webhook:verbs=create;update,path=/validate-ipam-metal3-io-v1alpha1-ippool,mutating=false,failurePolicy=fail,groups=ipam.metal3.io,resources=ippools,versions=v1alpha1,name=validation.ippool.ipam.metal3.io,matchPolicy=Equivalent,sideEffects=None,admissionReviewVersions=v1;v1beta1
 // +kubebuilder:webhook:verbs=create;update,path=/mutate-ipam-metal3-io-v1alpha1-ippool,mutating=true,failurePolicy=fail,groups=ipam.metal3.io,resources=ippools,versions=v1alpha1,name=default.ippool.ipam.metal3.io,matchPolicy=Equivalent,sideEffects=None,admissionReviewVersions=v1;v1beta1
 
-var _ webhook.Defaulter = &IPPool{}
-var _ webhook.Validator = &IPPool{}
+var _ webhook.CustomDefaulter = &IPPool{}
+var _ webhook.CustomValidator = &IPPool{}
 
-func (c *IPPool) Default() {
+func (c *IPPool) Default(ctx context.Context, obj runtime.Object) error {
+	return nil
 }
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPPool) ValidateCreate() (admission.Warnings, error) {
+func (c *IPPool) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	return c.validate()
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPPool) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+func (c *IPPool) ValidateUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) (admission.Warnings, error) {
 	allErrs := field.ErrorList{}
 	oldM3ipp, ok := old.(*IPPool)
 	if !ok || oldM3ipp == nil {
@@ -161,7 +163,7 @@ func (c *IPPool) isAddressInBonds(address IPAddressStr) bool {
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPPool) ValidateDelete() (admission.Warnings, error) {
+func (c *IPPool) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	return nil, nil
 }
 

@@ -29,7 +29,7 @@ func TestIPPoolDefault(t *testing.T) {
 		},
 		Spec: IPPoolSpec{},
 	}
-	c.Default()
+	c.Default(nil, nil)
 
 	g.Expect(c.Spec).To(Equal(IPPoolSpec{}))
 	g.Expect(c.Status).To(Equal(IPPoolStatus{}))
@@ -58,13 +58,13 @@ func TestIPPoolValidation(t *testing.T) {
 			g := NewWithT(t)
 
 			if tt.expectErr {
-				_, err := tt.c.ValidateCreate()
+				_, err := tt.c.ValidateCreate(nil, nil)
 				g.Expect(err).To(HaveOccurred())
 			} else {
-				_, err := tt.c.ValidateCreate()
+				_, err := tt.c.ValidateCreate(nil, nil)
 				g.Expect(err).NotTo(HaveOccurred())
 			}
-			_, err := tt.c.ValidateDelete()
+			_, err := tt.c.ValidateDelete(nil, nil)
 			g.Expect(err).NotTo(HaveOccurred())
 		})
 	}
@@ -235,10 +235,10 @@ func TestIPPoolUpdateValidation(t *testing.T) {
 			}
 
 			if tt.expectErr {
-				_, err := newPool.ValidateUpdate(oldPool)
+				_, err := newPool.ValidateUpdate(nil, nil, oldPool)
 				g.Expect(err).To(HaveOccurred())
 			} else {
-				_, err := newPool.ValidateUpdate(oldPool)
+				_, err := newPool.ValidateUpdate(nil, nil, oldPool)
 				g.Expect(err).NotTo(HaveOccurred())
 			}
 		})

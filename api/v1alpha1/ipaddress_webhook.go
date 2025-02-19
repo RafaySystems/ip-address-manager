@@ -14,6 +14,8 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"context"
+
 	"github.com/pkg/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -32,14 +34,15 @@ func (c *IPAddress) SetupWebhookWithManager(mgr ctrl.Manager) error {
 // +kubebuilder:webhook:verbs=create;update,path=/validate-ipam-metal3-io-v1alpha1-ipaddress,mutating=false,failurePolicy=fail,groups=ipam.metal3.io,resources=ipaddresses,versions=v1alpha1,name=validation.ipaddress.ipam.metal3.io,matchPolicy=Equivalent,sideEffects=None,admissionReviewVersions=v1;v1beta1
 // +kubebuilder:webhook:verbs=create;update,path=/mutate-ipam-metal3-io-v1alpha1-ipaddress,mutating=true,failurePolicy=fail,groups=ipam.metal3.io,resources=ipaddresses,versions=v1alpha1,name=default.ipaddress.ipam.metal3.io,matchPolicy=Equivalent,sideEffects=None,admissionReviewVersions=v1;v1beta1
 
-var _ webhook.Defaulter = &IPAddress{}
-var _ webhook.Validator = &IPAddress{}
+var _ webhook.CustomDefaulter = &IPAddress{}
+var _ webhook.CustomValidator = &IPAddress{}
 
-func (c *IPAddress) Default() {
+func (c *IPAddress) Default(ctx context.Context, obj runtime.Object) error {
+	return nil
 }
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPAddress) ValidateCreate() (admission.Warnings, error) {
+func (c *IPAddress) ValidateCreate(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	allErrs := field.ErrorList{}
 	if c.Spec.Pool.Name == "" {
 		allErrs = append(allErrs,
@@ -78,7 +81,7 @@ func (c *IPAddress) ValidateCreate() (admission.Warnings, error) {
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPAddress) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+func (c *IPAddress) ValidateUpdate(ctx context.Context, obj runtime.Object, old runtime.Object) (admission.Warnings, error) {
 	allErrs := field.ErrorList{}
 	oldIPAddress, ok := old.(*IPAddress)
 	if !ok || oldIPAddress == nil {
@@ -154,6 +157,6 @@ func (c *IPAddress) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type.
-func (c *IPAddress) ValidateDelete() (admission.Warnings, error) {
+func (c *IPAddress) ValidateDelete(ctx context.Context, obj runtime.Object) (admission.Warnings, error) {
 	return nil, nil
 }
